@@ -53,7 +53,6 @@ class JwtTokenAuthenticator {
                     "regDate" to System.currentTimeMillis()
             )
 
-
     private fun createClaims(user: User): Map<String, Any> =
             mapOf(
                     CLAIMS_EMAIL to user.email,

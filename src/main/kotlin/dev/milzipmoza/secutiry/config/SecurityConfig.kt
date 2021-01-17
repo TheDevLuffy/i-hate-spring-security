@@ -1,5 +1,7 @@
 package dev.milzipmoza.secutiry.config
 
+import dev.milzipmoza.secutiry.filter.UserAuthenticationFilter
+import dev.milzipmoza.secutiry.handler.UserAuthenticationSuccessHandler
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,7 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig : WebSecurityConfigurerAdapter() {
+class SecurityConfig(
+        private val userAuthenticationSuccessHandler: UserAuthenticationSuccessHandler
+) : WebSecurityConfigurerAdapter() {
 
     override fun configure(web: WebSecurity) {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
@@ -40,4 +44,13 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
      */
     @Bean
     fun passwordEncoder(): BCryptPasswordEncoder = BCryptPasswordEncoder()
+
+    @Bean
+    fun userAuthenticationFilter(): UserAuthenticationFilter =
+            UserAuthenticationFilter(authenticationManager())
+                .apply {
+                    setFilterProcessesUrl("/user/login")
+                    setAuthenticationSuccessHandler(userAuthenticationSuccessHandler)
+                    afterPropertiesSet()
+                }
 }

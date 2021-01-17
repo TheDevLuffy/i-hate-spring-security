@@ -5,19 +5,16 @@ import dev.milzipmoza.secutiry.domain.UserRole
 import dev.milzipmoza.secutiry.util.logger
 import io.jsonwebtoken.*
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
 import java.security.Key
 import java.util.*
 import javax.crypto.spec.SecretKeySpec
 import javax.xml.bind.DatatypeConverter
 
-@Component
-class JwtTokenAuthenticator(
-        @Value("jwt.secret-key")
-        private val secretKey: String
-) {
+class JwtTokenAuthenticator {
+    @Value("jwt.secret-key")
+    private lateinit var secretKey: String
+
     private val log = logger(this)
-    private val key = DatatypeConverter.parseBase64Binary(secretKey)
 
     fun generateJwtToken(user: User): String =
             Jwts.builder().apply {
@@ -70,10 +67,10 @@ class JwtTokenAuthenticator(
             }.time
 
     private fun createSigningKey(): Key =
-            SecretKeySpec(key, SignatureAlgorithm.HS256.jcaName)
+            SecretKeySpec(DatatypeConverter.parseBase64Binary(secretKey), SignatureAlgorithm.HS256.jcaName)
 
     private fun getClaims(token: String): Claims =
-            Jwts.parser().setSigningKey(key).parseClaimsJws(token).body
+            Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(secretKey)).parseClaimsJws(token).body
 
     private fun getName(token: String): String =
             getClaims(token)[CLAIMS_NAME] as String

@@ -2,22 +2,22 @@ package dev.milzipmoza.secutiry.config
 
 import dev.milzipmoza.secutiry.filter.UserAuthenticationFilter
 import dev.milzipmoza.secutiry.handler.UserAuthenticationSuccessHandler
+import dev.milzipmoza.secutiry.provider.UserAuthenticationProvider
+import dev.milzipmoza.secutiry.security.JwtTokenAuthenticator
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.server.ServerHttpSecurity.http
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(
-        private val userAuthenticationSuccessHandler: UserAuthenticationSuccessHandler
-) : WebSecurityConfigurerAdapter() {
+class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     override fun configure(web: WebSecurity) {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
@@ -39,6 +39,10 @@ class SecurityConfig(
                 }
     }
 
+    override fun configure(auth: AuthenticationManagerBuilder) {
+        auth.authenticationProvider(userAuthenticationProvider())
+    }
+
     /**
      * 비밀번호 암호화용, 소셜 로그인이 붙으면 사용하지 않을 예정
      */
@@ -50,7 +54,16 @@ class SecurityConfig(
             UserAuthenticationFilter(authenticationManager())
                 .apply {
                     setFilterProcessesUrl("/user/login")
-                    setAuthenticationSuccessHandler(userAuthenticationSuccessHandler)
+                    setAuthenticationSuccessHandler(userAuthenticationSuccessHandler())
                     afterPropertiesSet()
                 }
+
+    @Bean
+    fun jwtTokenAuthenticator(): JwtTokenAuthenticator = JwtTokenAuthenticator()
+
+    @Bean
+    fun userAuthenticationSuccessHandler(): UserAuthenticationSuccessHandler = UserAuthenticationSuccessHandler()
+
+    @Bean
+    fun userAuthenticationProvider(): UserAuthenticationProvider = UserAuthenticationProvider()
 }

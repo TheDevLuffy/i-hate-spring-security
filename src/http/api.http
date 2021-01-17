@@ -1,0 +1,35 @@
+GET http://localhost:8080/user/findAll
+Authorization: Bearer a
+
+###
+POST http://localhost:8080/user
+Content-Type: application/json
+
+{
+  "email": "thedevluffy@gmail.com",
+  "name": "루피",
+  "password": "159456"
+}
+
+###
+POST http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+  "email": "thedevluffy@gmail.com",
+  "password": "159456"
+}
+
+###
+POST http://localhost:8080/users/enroll
+Content-Type: application/json
+
+{
+  "email": "thedevluffy@gmail.com",
+  "password": "159456",
+  "name": "루피"
+}
+
+###
+GET http://localhost:8080/user/findAll
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsInJlZ0RhdGUiOjE2MTA4ODg4ODQ2ODZ9.eyJlbWFpbCI6InRoZWRldmx1ZmZ5QGdtYWlsLmNvbSIsIm5hbWUiOiLro6jtlLwiLCJyb2xlIjoiUk9MRV9OT05FIiwiZXhwIjoxNjEzNDgwODg0fQ.YGiXPxznAZ1-diSvDyLMAm5AixrcX-v8erIEgQyHdWI
